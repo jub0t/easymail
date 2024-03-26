@@ -7,7 +7,7 @@ $success = false;
 $messages = [];
 
 // Logic Start
-$email_sent = SendMail(
+SendMail(
     [
         [
             "email" => "jforeverything2007@gmail.com",
@@ -25,6 +25,6 @@ echo json_encode([
     "success" => $success,
     "messages" => $messages,
     "data" => [
-        "email_sent" => $email_sent
+        // "email_sent" => $email_sent
     ]
 ]);
