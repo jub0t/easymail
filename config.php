@@ -7,16 +7,18 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\SMTP;
 
+// Load configuration from YAML file
+$YLOADER = new Loader(null, 0, false);
+$M_CONFIG = $YLOADER->load("./config.yml")->parse();
+
 function SendMail($receivers, $message)
 {
+    global $M_CONFIG;
+
     // Check if PHPMailer class exists
     if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
         throw new Exception('PHPMailer class not found. Please check if the autoload file is loaded properly.');
     }
-
-    // Load configuration from YAML file
-    $YLOADER = new Loader(null, 0, false);
-    $M_CONFIG = $YLOADER->load("./config.yml")->parse();
 
     // Create a new PHPMailer instance
     $mail = new PHPMailer(true);
@@ -24,12 +26,15 @@ function SendMail($receivers, $message)
     // Set SMTP configuration
     $mail->SMTPDebug = SMTP::DEBUG_OFF;
     $mail->SMTPAuth = true;
-    $mail->isSMTP();
-    $mail->Host = $M_CONFIG->mail->host;
+
+    // No SMTP because we'll be hosting this directly on our namecheap cpanel :)
+    // $mail->isSMTP();
+
+    // Authentication loaded from config.yml file, ig.
     $mail->Username = $M_CONFIG->mail->username;
     $mail->Password = $M_CONFIG->mail->password;
+    $mail->Host = $M_CONFIG->mail->host;
     $mail->Port = $M_CONFIG->mail->port;
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
 
     // Set sender information
     $mail->setFrom($M_CONFIG->mail->username, $M_CONFIG->mail->displayName);
