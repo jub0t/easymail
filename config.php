@@ -11,59 +11,61 @@ use PHPMailer\PHPMailer\SMTP;
 $YLOADER = new Loader(null, 0, false);
 $M_CONFIG = $YLOADER->load("./config.yml")->parse();
 
-function SendMail($receivers, $message)
-{
-    global $M_CONFIG;
+if (!function_exists('SendEasyMail')) {
 
-    // Check if PHPMailer class exists
-    if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
-        throw new Exception('PHPMailer class not found. Please check if the autoload file is loaded properly.');
-    }
+    function SendEasyMail($receivers, $message)
+    {
+        global $M_CONFIG;
 
-    // Create a new PHPMailer instance
-    $mail = new PHPMailer(true);
+        // Check if PHPMailer class exists
+        if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+            throw new Exception('PHPMailer class not found. Please check if the autoload file is loaded properly.');
+        }
 
-    // Set SMTP configuration
-    $mail->SMTPDebug = SMTP::DEBUG_OFF;
-    $mail->SMTPAuth = true;
+        // Create a new PHPMailer instance
+        $mail = new PHPMailer(true);
 
-    // No SMTP because we'll be hosting this directly on our namecheap cpanel :)
-    // $mail->isSMTP();
+        // Set SMTP configuration
+        $mail->SMTPDebug = SMTP::DEBUG_OFF;
+        $mail->SMTPAuth = true;
 
-    // Authentication loaded from config.yml file, ig.
-    $mail->Username = $M_CONFIG->mail->username;
-    $mail->Password = $M_CONFIG->mail->password;
-    $mail->Host = $M_CONFIG->mail->host;
-    $mail->Port = $M_CONFIG->mail->port;
+        // No SMTP because we'll be hosting this directly on our namecheap cpanel :)
+        // $mail->isSMTP();
 
-    // Set sender information
-    $mail->setFrom($M_CONFIG->mail->username, $M_CONFIG->mail->displayName);
+        // Authentication loaded from config.yml file, ig.
+        $mail->Username = $M_CONFIG->mail->username;
+        $mail->Password = $M_CONFIG->mail->password;
+        $mail->Port = $M_CONFIG->mail->port;
 
-    // Add receivers
-    foreach ($receivers as $receiver) {
-        $displayName = isset($receiver["displayName"]) ? $receiver["displayName"] : null;
-        $mail->addAddress($receiver["email"], $displayName);
-    }
+        // Set sender information
+        $mail->setFrom($M_CONFIG->mail->username, $M_CONFIG->mail->displayName);
 
-    // Set email content
-    $mail->isHTML(true);
-    if (isset($message["subject"])) {
-        $mail->Subject = $message["subject"];
-    }
-    if (isset($message["body"])) {
-        $mail->Body = $message["body"];
-    }
-    if (isset($message["altBody"])) {
-        $mail->AltBody = $message["altBody"];
-    }
+        // Add receivers
+        foreach ($receivers as $receiver) {
+            $displayName = isset($receiver["displayName"]) ? $receiver["displayName"] : null;
+            $mail->addAddress($receiver["email"], $displayName);
+        }
 
-    try {
-        // Send email
-        $mail->send();
-        return true;
-    } catch (Exception $e) {
-        // Handle exceptions
-        error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
-        return false;
+        // Set email content
+        $mail->isHTML(true);
+        if (isset($message["subject"])) {
+            $mail->Subject = $message["subject"];
+        }
+        if (isset($message["body"])) {
+            $mail->Body = $message["body"];
+        }
+        if (isset($message["altBody"])) {
+            $mail->AltBody = $message["altBody"];
+        }
+
+        try {
+            // Send email
+            $mail->send();
+            return true;
+        } catch (Exception $e) {
+            // Handle exceptions
+            error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
+            return false;
+        }
     }
 }

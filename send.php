@@ -1,6 +1,7 @@
 <?php
 
 include "./config.php";
+include "./db.php";
 
 header("Content-type: application/json");
 $success = false;
@@ -42,12 +43,33 @@ if (!isset($input["message"])) {
     finish();
 }
 
+$headers = getallheaders();
+$api_key = $headers["api_key"];
+
+if (!isset($api_key)) {
+    array_push($messages, "Authentication key not found.");
+    finish();
+} else {
+    $allowed = verify_api_key($api_key);
+
+    if (!$allowed) {
+        array_push($messages, "Unauthorized to use this server, use a valid API Key.");
+        finish();
+    }
+}
+
 // Logic Start
-SendMail(
+$mail_sent = SendEasyMail(
     $input["receivers"],
     $input["message"]
 );
 // Logic End
 
-$success = true;
+if ($mail_sent) {
+    $success = true;
+    array_push($messages, "Email is on its way!");
+} else {
+    array_push($messages, "Something went wrong while sending email");
+}
+
 finish();
