@@ -1,0 +1,11 @@
+mail:
+  password: "myemailpassword"
+  username: "example@example.com"
+  host: "smtp.namecheap.com"
+  port: 465
+db:
+  username: "mysql"
+  password: "mysql"
+  database: "easymaildb"
+  host: "127.0.0.1"
+  port: 3306

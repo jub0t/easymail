@@ -1,16 +1,16 @@
 <?php
 
-$M_CONFIG = [
-    "mail" =>    [
-        "username" => "",
-        "password" => "",
-        "email" => "",
-    ],
-    "db" => [
-        "username" => "",
-        "password" => "",
-        "database" => "",
-        "host" => "127.0.0.1",
-        "port" => 3306,
-    ]
-];
+// Configuration for Mail server and MySQL Database
+include "./vendor/autoload.php";
+
+use Dallgoot\Yaml\Loader;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+$DEBUG = false;
+$YLOADER = new Loader(null, 0, $DEBUG);
+$M_CONFIG = $YLOADER->load("./config.yml")->parse();
+
+function SendMail()
+{
+}

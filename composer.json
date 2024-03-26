@@ -1,0 +1,6 @@
+{
+    "require": {
+        "dallgoot/yaml": "0.9.1.2",
+        "phpmailer/phpmailer": "^6.9"
+    }
+}
