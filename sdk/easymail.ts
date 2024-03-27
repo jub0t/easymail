@@ -1,3 +1,4 @@
+import { readFileSync } from 'fs';
 import undici from 'undici'
 
 export interface EasyMailOptions {
@@ -7,6 +8,11 @@ export interface EasyMailOptions {
 export interface EmReceiver {
     email: string,
     displayName?: string
+}
+
+export interface EmResponse {
+    success: boolean,
+    messages: string[]
 }
 
 export interface EmMessage {
@@ -45,6 +51,18 @@ class EasyMail {
         return this;
     }
 
+
+    setHTMLBody(file_path: string) {
+        const contents = readFileSync(file_path, "utf-8");
+
+        this.message = {
+            ...this.message,
+            body: contents
+        }
+
+        return this;
+    }
+
     setSubject(subject: string) {
         this.message = {
             ...this.message,
@@ -54,17 +72,20 @@ class EasyMail {
         return this;
     }
 
-    async send() {
+    async send(): Promise<EmResponse> {
         return new Promise(async (resolve, reject) => {
             let req = await undici.request(`${this.url}/send.php`, {
                 method: "POST",
                 body: JSON.stringify({
                     receivers: this.receivers,
                     message: this.message,
-                })
+                }),
+                headers: {
+                    "api_key": this.api_key
+                }
             })
 
-            resolve(req.body)
+            resolve(req.body.json() as any)
         })
     }
 }
